@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract SimpleNFT is ERC721 {
+contract SimpleNFT is ERC721URIStorage {
     uint256 public tokenCounter;
 
     constructor() public ERC721("Simple NFT", "SIMPLE_NFT_DOG") {

@@ -2,28 +2,34 @@ from brownie import config, network, SimpleNFT
 from scripts.helpers import get_account
 
 
-def deploy():
+OPENSEA_URL_BASE = "https://testnets.opensea.io/assets/{}/{}"
+SAMPLE_TOKEN_URI = "https://ipfs.io/ipfs/Qmd9MCGtdVz2miNumBHDbvj8bigSgTwnr4SbyH6DNnpWdt?filename=0-PUG.json"
+
+
+def deploy_and_create_collectible():
     account = get_account()
     must_publish = config["networks"][network.show_active()].get("verify")
     print('Deploying...\n')
 
-    simple_nft = SimpleNFT.deploy(
+    contract_instance = SimpleNFT.deploy(
         { "from": account },
         publish_source=must_publish
     )
 
     print('Deployed!\n')
-    print('Token name: "%s"'  % simple_nft.name())
-    print('Token symbol: "%s"'  % simple_nft.symbol())
-    print('Total supply: "%s"\n'  % simple_nft.totalSupply())
+    print('Token name: "%s"'  % contract_instance.name())
+    print('Token symbol: "%s"'  % contract_instance.symbol())
 
-    return simple_nft
+    tx = contract_instance.createNFT(SAMPLE_TOKEN_URI, {"from": account})
+    tx.wait(1)
 
+    OPENSEA_URL = OPENSEA_URL_BASE.format(contract_instance.address, contract_instance.tokenCounter() - 1)
 
-def create_collectible(contract_instance):
-    contract_instance.createCollectible()
+    print(f"Awesome, you can view your NFT at {OPENSEA_URL}")
+    print("Please wait up to 20 minutes, and hit the refresh metadata button. ")
+
+    return contract_instance
 
 
 def main():
-    instance = deploy()
-    create_collectible(instance)
+    deploy_and_create_collectible()
